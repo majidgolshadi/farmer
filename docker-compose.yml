@@ -1,0 +1,85 @@
+mysql_api:
+  container_name: paas_mysql_api
+  build: mysql/api
+  restart: always
+  links:
+    - mysql
+  environment:
+    SERVICE_IGNORE: ignore
+
+mysql:
+  container_name: paas_mysql_service
+  image: mysql:5.6
+  restart: always
+  environment:
+    MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+    SERVICE_IGNORE: ignore
+  volumes_from:
+    - data
+
+data:
+  container_name: paas_mysql_data
+  build: mysql/data
+  restart: always
+  volumes:
+    - /etc/farmer/db:/var/lib/mysql
+  environment:
+    SERVICE_IGNORE: ignore
+
+
+etcd:
+  container_name: etcd_server
+  image: quay.io/coreos/etcd:v2.2.1
+  restart: always
+  ports:
+    - 2379:2379
+  command:
+    - -name=etcd
+    - -data-dir=/var/etcd/data
+    - -listen-client-urls=http://0.0.0.0:2379
+    - -listen-peer-urls=http://0.0.0.0:2380
+    - -advertise-client-urls=http://etcd_server:2379
+  volumes:
+    - /etc/farmer/etcd:/var/etcd/data
+  environment:
+    SERVICE_IGNORE: ignore
+
+registrator:
+  container_name: registrator
+  image: gliderlabs/registrator:v6
+  restart: always
+  command: -internal -ttl 11 -ttl-refresh 10 -resync 10 etcd://etcd_server:2379/services
+  links:
+    - etcd
+  volumes:
+    - "/var/run/docker.sock:/tmp/docker.sock"
+  environment:
+    SERVICE_IGNORE: ignore
+
+proxy:
+  container_name: proxy_server
+  build: proxy
+  links:
+    - etcd
+  ports:
+    - 80:80
+  volumes:
+    - /etc/farmer/revere_proxy/certs:/certs
+  environment:
+    ETCD_NODE: etcd_server:2379
+    SERVICE_IGNORE: ignore
+    MAIN_DOMAIN: ravaj.ir
+  restart: always
+
+browser:
+  container_name: etcd_browser
+  image: buddho/etcd-browser
+  restart: always
+  ports:
+    - 8000:8000
+  links:
+    - etcd
+  environment:
+    ETCD_HOST: etcd_server
+    ETCD_PORT: 2379
+    SERVICE_IGNORE: ignore

@@ -1,0 +1,229 @@
+/* reset */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, dl, dt, dd, ol, nav ul, nav li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+
+ol, ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+blockquote, q {
+    quotes: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after {
+    content: '';
+    content: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* start editing from here */
+a {
+    text-decoration: none;
+}
+
+.txt-rt {
+    text-align: right;
+}
+
+/* text align right */
+.txt-lt {
+    text-align: left;
+}
+
+/* text align left */
+.txt-center {
+    text-align: center;
+}
+
+/* text align center */
+.float-rt {
+    float: right;
+}
+
+/* float right */
+.float-lt {
+    float: left;
+}
+
+/* float left */
+.clear {
+    clear: both;
+}
+
+/* clear float */
+.pos-relative {
+    position: relative;
+}
+
+/* Position Relative */
+.pos-absolute {
+    position: absolute;
+}
+
+/* Position Absolute */
+.vertical-base {
+    vertical-align: baseline;
+}
+
+/* vertical align baseline */
+.vertical-top {
+    vertical-align: top;
+}
+
+/* vertical align top */
+.underline {
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    margin: 0 0 20px 0;
+}
+
+/* Add 5px bottom padding and a underline */
+nav.vertical ul li {
+    display: block;
+}
+
+/* vertical menu */
+nav.horizontal ul li {
+    display: inline-block;
+}
+
+/* horizontal menu */
+img {
+    max-width: 100%;
+}
+
+body {
+    background-size: 100%;
+    font-size: 100%;
+    background: url(bg.jpg) no-repeat fixed 100% 100%;
+    background-size: cover;
+}
+
+.wrap {
+    width: 70%;
+    margin: 5.2% auto 4% auto;
+}
+
+.logo {
+    padding: 1em;
+    text-align: center;
+    padding: 1% 1% 5% 1%;
+}
+
+.logo h1 {
+    display: block;
+    padding: 2em 0em;
+}
+
+.logo span {
+    font-size: 2em;
+    color: #fff;
+}
+
+.logo span img {
+    width: 40px;
+    height: 40px;
+    vertical-align: bottom;
+    margin: 0 10px;
+}
+
+.copy_right {
+    color: #fff;
+    font-size: 0.85em;
+    line-height: 1.8em;
+    padding: 5em 0 0 0;
+    text-align: center;
+}
+
+.copy_right a {
+    color: #ffdaf6;
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+}
+
+.copy_right a:hover {
+    color: #fff;
+}
+
+@media only screen and (max-width: 768px) {
+    .wrap {
+        width: 80%;
+    }
+
+    .logo img {
+        width: 315px;
+    }
+}
+
+@media only screen and (max-width: 640px) {
+    .wrap {
+        width: 85%;
+    }
+
+    .logo {
+        padding: 1% 1% 12% 1%;
+    }
+
+    .logo img {
+        width: 300px;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .wrap {
+        width: 90%;
+    }
+
+    .logo {
+        padding: 1% 1% 12% 1%;
+    }
+
+    .logo span {
+        font-size: 1.6em;
+    }
+
+    .logo img {
+        width: 270px;
+    }
+}
+
+@media only screen and (max-width: 320px) {
+    .wrap {
+        width: 90%;
+    }
+
+    .logo {
+        padding: 1% 1% 12% 1%;
+    }
+
+    .logo span {
+        font-size: 1.4em;
+    }
+
+    .logo img {
+        width: 200px;
+    }
+
+    .copy_right {
+        padding: 2em 0 0 0;
+    }
+}

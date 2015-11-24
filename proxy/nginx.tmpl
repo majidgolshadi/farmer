@@ -1,0 +1,58 @@
+{{ range $service := lsdir "/services" }}
+  {{ $hasDomain := ls (printf "/services/%s/domains" $service) }}
+  {{ $hasHttp := ls (printf "/services/%s/http" $service) }}{{ $hasHttps := ls (printf "/services/%s/https" $service) }}
+  {{ if or $hasHttp $hasHttps }}
+    upstream backend_{{ base $service }} {
+        least_conn;{{ $hosts := printf "/services/%s/http/*" $service }}{{ range getvs $hosts }}
+        server {{.}};{{end}}
+      {{ $hosts := printf "/services/%s/https/*" $service }}{{ range getvs $hosts }}
+        server {{.}};{{end}}
+    }
+    {{ if ls (printf "/services/%s/http/" $service) }}
+    server {
+      listen 80;
+      server_name {{ base $service }}.http.subsrv.{{ getenv "MAIN_DOMAIN" }};
+      {{ $domains := printf "/services/%s/domains/*" $service }}{{ range getvs $domains }}
+      server_name {{.}};{{end}}
+
+      location / {
+        proxy_pass http://backend_{{base $service}};
+        proxy_redirect off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      }
+    }
+    {{end}}
+    {{ if ls (printf "/services/%s/https/certs" $service) }}
+    server {
+      listen 443 ssl;
+      server_name {{ base $service }}.ssl.subsrv.{{ getenv "MAIN_DOMAIN" }};
+      {{ $domains := printf "/services/%s/domains/*" $service }}{{ range getvs $domains }}
+      server_name {{.}};{{end}}
+      client_max_body_size 100M;
+      location / {
+        proxy_pass http://backend_{{base $service}};
+        proxy_ssl  on;
+        proxy_ssl_certificate        (printf "/services/%s/https/certs/crt" $service);
+        proxy_ssl_certificate_key    (printf "/services/%s/https/certs/key" $service);
+        proxy_ssl_protocols          SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+        proxy_redirect off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      }
+    }
+    {{end}}
+  {{end}}
+{{end}}
+
+server {
+  listen 80 default_server;
+  server_name  _;
+
+  location / {
+    root /usr/share/nginx/html;
+    index index.html;
+  }
+}
