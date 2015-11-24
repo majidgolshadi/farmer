@@ -35,7 +35,11 @@ $app->post('/create', function(Request $request) use($app, $connection) {
         ), 500);
     }
 
-    defineUser($connection, $username, $password);
+    if (!($err = defineUser($connection, $username, $password))) {
+        return $app->json(array(
+            'message' => "Could not user ".mysql_error()."."
+        ), 500);
+    }
 
     if (!($err = grantUserToDB($connection, $username, $database))) {
         return $app->json(array(
@@ -71,7 +75,11 @@ function defineUser($connection, $username, $password) {
         $connection
     );
 
-    mysql_query(
+    if (1396 != mysql_errno()) {
+        return "";
+    }
+
+    return mysql_query(
         "SET PASSWORD FOR '".$username."'@'%' = PASSWORD('".$password."');",
         $connection
     );
