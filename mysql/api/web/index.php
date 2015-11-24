@@ -29,7 +29,12 @@ $app->post('/create', function(Request $request) use($app, $connection) {
     $username = $database;
     $password = randomPwd(12);
 
-    createDB($connection, $database);
+    if (!($err = createDB($connection, $database))) {
+        return $app->json(array(
+            'message' => "Could not create ".mysql_error()." database."
+        ), 500);
+    }
+
     defineUser($connection, $username, $password);
 
     if (!($err = grantUserToDB($connection, $username, $database))) {
@@ -55,7 +60,7 @@ function randomPwd($length){
 
 function createDB($connection, $database_name) {
     return mysql_query(
-        "CREATE DATABASE $database_name DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;",
+        "CREATE DATABASE IF NOT EXISTS $database_name DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;",
         $connection
     );
 }
