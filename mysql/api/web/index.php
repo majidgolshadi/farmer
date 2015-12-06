@@ -29,21 +29,15 @@ $app->post('/create', function(Request $request) use($app, $connection) {
     $username = $database;
     $password = randomPwd(12);
 
-    if (!($err = createDB($connection, $database))) {
+    if (!($err = createDatabase($connection, $database))) {
         return $app->json(array(
-            'message' => "Could not create ".mysql_error()." database."
+            'message' => 'Could not create database "'.mysql_error($connection).'".'
         ), 500);
     }
 
-    if (!($err = defineUser($connection, $username, $password))) {
+    if (!($err = createUser($connection, $database, $username, $password))) {
         return $app->json(array(
-            'message' => "Could not user ".mysql_error()."."
-        ), 500);
-    }
-
-    if (!($err = grantUserToDB($connection, $username, $database))) {
-        return $app->json(array(
-            'message' => "Could not set user privileges ".mysql_error()."."
+            'message' => 'Could not create user "'.mysql_error($connection).'".'
         ), 500);
     }
 
@@ -62,32 +56,26 @@ function randomPwd($length){
     return substr(implode($a), 0, $length);
 }
 
-function createDB($connection, $database_name) {
+function createDatabase($connection, $database) {
     return mysql_query(
-        "CREATE DATABASE IF NOT EXISTS $database_name DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;",
+        "CREATE DATABASE IF NOT EXISTS `$database` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;",
         $connection
     );
 }
 
-function defineUser($connection, $username, $password) {
-    mysql_query(
-        "CREATE USER '".$username."'@'%' IDENTIFIED BY '".$password."';",
+function createUser($connection, $database, $username, $password) {
+    $err = mysql_query(
+        // This will create user if it does not exists. http://stackoverflow.com/a/16592722/899205
+        "GRANT ALL ON `$database`.* to '$username'@'%' identified by '$password';",
         $connection
     );
 
-    if (1396 != mysql_errno()) {
-        return "";
+    if (!$err) {
+        return $err;
     }
 
     return mysql_query(
-        "SET PASSWORD FOR '".$username."'@'%' = PASSWORD('".$password."');",
-        $connection
-    );
-}
-
-function grantUserToDB($connection, $username, $database) {
-    return mysql_query(
-        "GRANT ALL PRIVILEGES ON ".$database.".* TO '".$username."'@'%' WITH GRANT OPTION;",
+        "SET PASSWORD FOR '$username'@'%' = PASSWORD('$password');",
         $connection
     );
 }
