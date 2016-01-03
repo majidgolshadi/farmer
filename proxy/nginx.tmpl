@@ -11,7 +11,6 @@
     {{ if ls (printf "/services/%s/http/" $service) }}
     server {
       listen 80;
-      server_name {{ base $service }}.http.subsrv.{{ getenv "MAIN_DOMAIN" }};
       {{ $domains := printf "/services/%s/domains/*" $service }}{{ range getvs $domains }}
       server_name {{.}};{{end}}
 
@@ -27,7 +26,6 @@
     {{ if ls (printf "/services/%s/https/certs" $service) }}
     server {
       listen 443 ssl;
-      server_name {{ base $service }}.ssl.subsrv.{{ getenv "MAIN_DOMAIN" }};
       {{ $domains := printf "/services/%s/domains/*" $service }}{{ range getvs $domains }}
       server_name {{.}};{{end}}
       client_max_body_size 100M;
