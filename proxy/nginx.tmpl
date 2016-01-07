@@ -1,56 +1,56 @@
 {{ range $service := lsdir "/services" }}
-  {{ $hasDomain := ls (printf "/services/%s/domains" $service) }}
-  {{ $hasHttp := ls (printf "/services/%s/http" $service) }}{{ $hasHttps := ls (printf "/services/%s/https" $service) }}
-  {{ if or $hasHttp $hasHttps }}
+{{ $hasHttp := ls (printf "/services/%s/http" $service) }}{{ $hasHttps := ls (printf "/services/%s/https" $service) }}
+{{ if or $hasHttp $hasHttps }}
     upstream backend_{{ base $service }} {
-        least_conn;{{ $hosts := printf "/services/%s/http/*" $service }}{{ range getvs $hosts }}
+        least_conn;{{range getvs (printf "/services/%s/http/*" $service)}}
         server {{.}};{{end}}
-      {{ $hosts := printf "/services/%s/https/*" $service }}{{ range getvs $hosts }}
+        {{ range getvs (printf "/services/%s/https/*" $service) }}
         server {{.}};{{end}}
     }
-    {{ if ls (printf "/services/%s/http/" $service) }}
+    {{ range $tenant := lsdir (printf "/services/%s/tenants" $service) }}{{ if ls (printf "/services/%s/http" $service) }}
     server {
-      listen 80;
-      {{ $domains := printf "/services/%s/domains/*" $service }}{{ range getvs $domains }}
-      server_name {{.}};{{end}}
+        listen 80;
+        {{ range getvs (printf "/services/%s/tenants/%s/domains/*" $service $tenant) }}
+        server_name {{.}};{{end}}
 
-      location / {
-        proxy_pass http://backend_{{base $service}};
-        proxy_redirect off;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      }
+        location / {
+            proxy_pass http://backend_{{base $service}};
+            proxy_redirect off;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            {{ range gets (printf "/services/%s/tenants/%s/env/*" $service $tenant) }}
+            proxy_set_header {{base .Key}} "{{.Value}}";{{end}}
+        }
     }
-    {{end}}
-    {{ if ls (printf "/services/%s/https/certs" $service) }}
+    {{end}}{{ if ls (printf "/services/%s/https/certs" $service) }}
     server {
-      listen 443 ssl;
-      {{ $domains := printf "/services/%s/domains/*" $service }}{{ range getvs $domains }}
-      server_name {{.}};{{end}}
-      client_max_body_size 100M;
-      location / {
-        proxy_pass http://backend_{{base $service}};
-        proxy_ssl  on;
-        proxy_ssl_certificate        (printf "/services/%s/https/certs/crt" $service);
-        proxy_ssl_certificate_key    (printf "/services/%s/https/certs/key" $service);
-        proxy_ssl_protocols          SSLv3 TLSv1 TLSv1.1 TLSv1.2;
-        proxy_redirect off;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      }
+        listen 443 ssl;
+        {{ range getvs (printf "/services/%s/tenants/%s/domains/*" $service $tenant) }}
+        server_name {{.}};{{end}}
+        client_max_body_size 100M;
+        location / {
+            proxy_pass http://backend_{{base $service}};
+            proxy_ssl  on;
+            proxy_ssl_certificate        {{ getv (printf "/services/%s/https/certs/crt" $service) }};
+            proxy_ssl_certificate_key    {{ getv (printf "/services/%s/https/certs/key" $service) }};
+            proxy_ssl_protocols          SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+            proxy_redirect off;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            {{ range gets (printf "/services/%s/tenants/%s/env/*" $service $tenant) }}
+            proxy_set_header {{base .Key}} "{{.Value}}";{{end}}
+        }
     }
-    {{end}}
-  {{end}}
-{{end}}
-
+    {{end}}{{end}}
+{{end}}{{end}}
 server {
-  listen 80 default_server;
-  server_name  _;
+    listen 80 default_server;
+    server_name  _;
 
-  location / {
-    root /usr/share/nginx/html;
-    index index.html;
-  }
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+    }
 }
