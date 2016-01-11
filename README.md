@@ -15,6 +15,6 @@ If you want to run a Farmer instance on a remote docker engine you need to confi
 To talk to a farmer instance you need to run `docker-compose`. (If your docker engine is on a remote server you need to set appropriate environment variables)
 
 ## Features
-* HAProxy load balancer to handle http/https traffic
-* Easy domain management
-* MySql service broker
+* **HAProxy Load Balancer** to handle http and/or https traffic.
+* **Domain Management** with etcd and registrator for your web containers.
+* **MySql Service Broker** for offering lightweight MySql contaienrs to all your projects.
