@@ -28,7 +28,7 @@ data:
 
 
 etcd:
-  container_name: etcd_server
+  container_name: paas_etcd_server
   image: quay.io/coreos/etcd:v2.2.1
   restart: always
   ports:
@@ -38,17 +38,17 @@ etcd:
     - -data-dir=/var/etcd/data
     - -listen-client-urls=http://0.0.0.0:2379
     - -listen-peer-urls=http://0.0.0.0:2380
-    - -advertise-client-urls=http://etcd_server:2379
+    - -advertise-client-urls=http://paas_etcd_server:2379
   volumes:
     - /etc/farmer/etcd:/var/etcd/data
   environment:
     SERVICE_IGNORE: ignore
 
 registrator:
-  container_name: registrator
+  container_name: paas_registrator
   image: gliderlabs/registrator:v6
   restart: always
-  command: -internal -ttl 11 -ttl-refresh 10 -resync 10 etcd://etcd_server:2379/services
+  command: -internal -ttl 11 -ttl-refresh 10 -resync 10 etcd://paas_etcd_server:2379/services
   links:
     - etcd
   volumes:
@@ -57,7 +57,7 @@ registrator:
     SERVICE_IGNORE: ignore
 
 proxy:
-  container_name: proxy_server
+  container_name: paas_proxy_server
   build: proxy
   links:
     - etcd
@@ -66,13 +66,13 @@ proxy:
   volumes:
     - /etc/farmer/revere_proxy/certs:/certs
   environment:
-    ETCD_NODE: etcd_server:2379
+    ETCD_NODE: paas_etcd_server:2379
     SERVICE_IGNORE: ignore
     MAIN_DOMAIN: ravaj.ir
   restart: always
 
 browser:
-  container_name: etcd_browser
+  container_name: paas_etcd_browser
   image: buddho/etcd-browser
   restart: always
   ports:
@@ -80,6 +80,16 @@ browser:
   links:
     - etcd
   environment:
-    ETCD_HOST: etcd_server
+    ETCD_HOST: paas_etcd_server
     ETCD_PORT: 2379
+    SERVICE_IGNORE: ignore
+
+toolbelt_daemon:
+  build: ./toolbelt_daemon
+  container_name: paas_toolbelt_daemon
+  restart: always
+  volumes:
+    - /etc/farmer/docker:/root/.docker
+    - /etc/farmer/gitkey:/root/.ssh
+  environment:
     SERVICE_IGNORE: ignore
