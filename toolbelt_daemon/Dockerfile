@@ -23,4 +23,4 @@ RUN \
 EXPOSE 80
 VOLUME "/root/.docker"
 
-CMD ["/bin/bash", "-c", "rm -rf /toolbelt-src && git clone https://github.com/ravaj-group/toolbelt.git /toolbelt-src --depth=1 && ln -s /toolbelt-src/toolbelt /usr/bin/ && daemon"]
+CMD ["/bin/bash", "-c", "rm -rf /toolbelt-src && git clone https://github.com/ravaj-group/toolbelt.git /toolbelt-src --depth=1 && ln -fs /toolbelt-src/toolbelt /usr/bin/ &>/dev/null && daemon"]
