@@ -26,7 +26,7 @@ $app->post('/create', function(Request $request) use($app, $connection) {
         ), 400);
     }
 
-    $username = $database;
+    $username = newUsername($connection);
     $password = randomPwd(12);
 
     if (!($err = createDatabase($connection, $database))) {
@@ -50,10 +50,26 @@ $app->post('/create', function(Request $request) use($app, $connection) {
 
 $app->run();
 
-function randomPwd($length){
+function randomPwd($length) {
     $a = str_split("abcdefghijklmnopqrstuvwxyABCDEFGHIJKLMNOPQRSTUVWXY0123456789");
     shuffle($a);
     return substr(implode($a), 0, $length);
+}
+
+function newUsername($connection) {
+    $exist = 'default_user';
+    $username = 'default_user';
+
+    while ($exist != "") {
+        $username = randomPwd(15);
+
+        $exist = mysql_query(
+            "SELECT User FROM mysql.user WHERE user = '$username';",
+            $connection
+        );
+    }
+
+    return $username;
 }
 
 function createDatabase($connection, $database) {
