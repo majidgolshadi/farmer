@@ -6,7 +6,8 @@ import (
 
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/binding"
-	"github.com/ravaj-group/farmer/toolbelt_daemon/daemon/api/request"
+
+	"github.com/ravaj-group/farmer/mysql/api/daemon/api/request"
 )
 
 func Listen() {
@@ -15,11 +16,11 @@ func Listen() {
 	server.Use(jsonRequest)
 	registerRoutes(server)
 
-	server.RunOnAddr(":" + os.Getenv("TOOLBELT_API_PORT"))
+	server.RunOnAddr(":" + os.Getenv("MYSQL_API_PORT"))
 }
 
 func registerRoutes(server *martini.ClassicMartini) {
-	server.Post("/exec", binding.Bind(request.CmdRequest{}), Execute)
+	server.Post("/create", binding.Bind(request.DbRequest{}), Create)
 }
 
 func jsonRequest(res http.ResponseWriter, req *http.Request) {

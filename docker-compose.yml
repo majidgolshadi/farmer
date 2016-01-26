@@ -36,8 +36,8 @@ etcd:
     - -name=etcd
     - -data-dir=/var/etcd/data
     - -listen-client-urls=http://0.0.0.0:2379
-    - -listen-peer-urls=http://0.0.0.0:2380
     - -advertise-client-urls=http://paas_etcd_server:2379
+    - --debug=true
   volumes:
     - /etc/farmer/etcd:/var/etcd/data
   environment:

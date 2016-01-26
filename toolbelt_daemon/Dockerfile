@@ -13,8 +13,8 @@ RUN \
     git config --global user.name "ravajbot" && \
     git config --global user.email "soheil_soheil@rocketmail.com"
 
-COPY ./daemon /go/src/github.com/ravaj-group/toolbelt/daemon
-WORKDIR  /go/src/github.com/ravaj-group/toolbelt/daemon
+COPY ./daemon /go/src/github.com/ravaj-group/farmer/toolbelt_daemon/daemon
+WORKDIR  /go/src/github.com/ravaj-group/farmer/toolbelt_daemon/daemon
 
 RUN \
     go get -d -v && \
