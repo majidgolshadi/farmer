@@ -88,15 +88,9 @@ toolbelt_daemon:
   container_name: paas_toolbelt_daemon
   restart: always
   links:
-    - redis
+    - etcd
   volumes:
     - /etc/farmer/docker:/root/.docker
     - /etc/farmer/gitkey:/root/.ssh
   environment:
     SERVICE_IGNORE: ignore
-
-redis:
-  image: redis:latest
-  restart: always
-  volumes:
-    - /etc/farmer/redis:/data

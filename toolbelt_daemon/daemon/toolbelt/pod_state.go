@@ -2,13 +2,13 @@ package toolbelt
 
 import "encoding/json"
 
-type PodStateResponse struct {
+type PodState struct {
 	State  	string	`json:"state"`
 	Message string 	`json:"message"`
 }
 
-func GetPodStateResponseJson(state string, message string) string {
-	json, _ := json.Marshal(&PodStateResponse{
+func PodStateJson(state string, message string) string {
+	json, _ := json.Marshal(&PodState{
 		State: state,
 		Message: message,
 	})

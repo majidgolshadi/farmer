@@ -4,9 +4,10 @@ ENV TOOLBELT_API_PORT=80
 ENV TOOLBELT_TEMP_DIR=/tmp
 
 RUN \
-    apt-get update -y && \
+    apt-get update -y --fix-missing && \
     apt-get install --force-yes -y git && \
     curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose && \
+    wget -qO- https://get.docker.com/ | sh && \
     chmod +x /usr/local/bin/docker-compose
 
 RUN \
